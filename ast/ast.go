@@ -7,7 +7,8 @@ import (
 )
 
 type Node interface {
-	TokenLiteral() string // mainly debugging and testing
+	// mainly debugging and testing
+	TokenLiteral() string
 	String() string
 }
 type Statement interface {
@@ -79,6 +80,17 @@ func (i *Identifier) String() string { return i.Value }
 func (i *Identifier) expressionNode()      {}
 func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 
+// ie. 5;
+type IntegerLiteral struct {
+	Token token.Token
+	Value int64
+}
+
+func (i *IntegerLiteral) expressionNode()      {}
+func (i *IntegerLiteral) TokenLiteral() string { return i.Token.Literal }
+
+func (i *IntegerLiteral) String() string { return i.Token.Literal }
+
 type ReturnStatement struct {
 	Token       token.Token // 'return token'
 	ReturnValue Expression
@@ -118,4 +130,48 @@ func (es *ExpressionStatement) String() string {
 	}
 
 	return ""
+}
+
+type PrefixExpression struct {
+	Token    token.Token // prefix token ie. ! or -
+	Operator string
+	Right    Expression
+}
+
+// ie. !5
+func (pe *PrefixExpression) expressionNode()      {}
+func (pe *PrefixExpression) TokenLiteral() string { return pe.Token.Literal }
+
+func (pe *PrefixExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(pe.Operator)
+	out.WriteString(pe.Right.String())
+	out.WriteString(")")
+
+	return out.String()
+}
+
+type InfixExpression struct {
+	Token    token.Token // operator token, ie +
+	Left     Expression
+	Operator string
+	Right    Expression
+}
+
+// 5 + 10
+func (ie *InfixExpression) expressionNode()      {}
+func (ie *InfixExpression) TokenLiteral() string { return ie.Token.Literal }
+
+func (ie *InfixExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(ie.Left.String())
+	out.WriteString(" " + ie.Operator + " ")
+	out.WriteString(ie.Right.String())
+	out.WriteString(")")
+
+	return out.String()
 }
