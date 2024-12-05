@@ -20,6 +20,15 @@ type Expression interface {
 	expressionNode()
 }
 
+type Boolean struct {
+	Token token.Token
+	Value bool
+}
+
+func (b *Boolean) expressionNode()      {}
+func (b *Boolean) TokenLiteral() string { return b.Token.Literal }
+func (b *Boolean) String() string       { return b.Token.Literal }
+
 // Program will be the root node of every AST our parser produces
 type Program struct {
 	Statements []Statement
